@@ -47,6 +47,10 @@ fun WorkoutEditScreen(
     viewModel: WorkoutEditScreenViewModel = hiltViewModel()
 ) {
     val workout by viewModel.workout.collectAsState(null)
+
+    val workoutName by viewModel.workoutName.collectAsState()
+    val workoutNote by viewModel.workoutNote.collectAsState()
+
     val isTemplate = viewModel.isTemplate
     val logEntriesWithJunction by viewModel.logEntriesWithExerciseJunction.collectAsState()
 
@@ -93,8 +97,8 @@ fun WorkoutEditScreen(
             WorkoutEditorComponent(
                 navController = navController,
                 navigator = navigator,
-                workoutName = workout?.name,
-                workoutNote = workout?.note,
+                workoutName = workoutName,
+                workoutNote = workoutNote,
                 useReboundKeyboard = true,
                 cancelWorkoutButtonVisible = false,
                 logEntriesWithJunction = logEntriesWithJunction,

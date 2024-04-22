@@ -110,7 +110,7 @@ class WorkoutEditScreenViewModel @Inject constructor(
 
     fun updateWorkoutName(name: String) {
         viewModelScope.launch {
-//            _workoutName.value = name
+            _workoutName.value = name
             mWorkout?.let {
                 workoutsRepository.updateWorkout(it.copy(name = name))
             }
@@ -119,7 +119,7 @@ class WorkoutEditScreenViewModel @Inject constructor(
 
     fun updateWorkoutNote(note: String) {
         viewModelScope.launch {
-//            _workoutNote.value = note
+            _workoutNote.value = note
             mWorkout?.let {
                 workoutsRepository.updateWorkout(it.copy(note = note))
             }
