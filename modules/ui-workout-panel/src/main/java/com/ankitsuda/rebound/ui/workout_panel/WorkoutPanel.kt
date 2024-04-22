@@ -19,12 +19,16 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.ankitsuda.base.util.NONE_WORKOUT_ID
+import com.ankitsuda.base.util.toast
+import com.ankitsuda.common.compose.R
 import com.ankitsuda.navigation.LocalNavigator
 import com.ankitsuda.navigation.Navigator
 import com.ankitsuda.rebound.ui.components.dialogs.DiscardActiveWorkoutDialog
+import com.ankitsuda.rebound.ui.components.dialogs.FinishActiveWorkoutDialog
 import com.ankitsuda.rebound.ui.components.workouteditor.WorkoutEditorComponent
 import com.ankitsuda.rebound.ui.workout_panel.components.WorkoutQuickInfo
 
@@ -43,6 +47,8 @@ fun WorkoutPanel1(
     navigator: Navigator,
     viewModel: WorkoutPanelViewModel = hiltViewModel()
 ) {
+    val context = LocalContext.current
+
     val currentWorkoutId by viewModel.currentWorkoutId.collectAsState(initial = NONE_WORKOUT_ID)
     val workout by viewModel.workout.collectAsState(null)
     val currentDurationStr by viewModel.currentDurationStr.collectAsState("")
@@ -53,6 +59,7 @@ fun WorkoutPanel1(
     var isCancelCurrentWorkoutDialogOpen by remember {
         mutableStateOf(false)
     }
+    val isFinishCurrentWorkoutDialogOpen by viewModel.finishWorkoutDialogState.collectAsState()
 
     val workoutName = workout?.name
     val workoutNote = workout?.note
@@ -118,7 +125,7 @@ fun WorkoutPanel1(
             onUpdateBarbell = viewModel::updateExerciseBarbellType
         )
 
-        if (isCancelCurrentWorkoutDialogOpen && workout?.startAt != null && workout?.completedAt != null) {
+        if (isCancelCurrentWorkoutDialogOpen && workout?.startAt != null) {
             DiscardActiveWorkoutDialog(
                 onDismissRequest = {
                     isCancelCurrentWorkoutDialogOpen = false
@@ -126,6 +133,20 @@ fun WorkoutPanel1(
                 onClickDiscard = {
                     viewModel.cancelCurrentWorkout()
                     isCancelCurrentWorkoutDialogOpen = false
+                },
+            )
+        }
+
+        if (isFinishCurrentWorkoutDialogOpen && workout?.startAt != null) {
+            FinishActiveWorkoutDialog(
+                onDismissRequest = {
+                    viewModel.closeFinishWorkoutDialog()
+                },
+                onClickFinish = {
+                    viewModel.finishWorkout {
+                        context.toast(message = context.getString(R.string.incomplete_sets_error))
+                    }
+                    viewModel.closeFinishWorkoutDialog()
                 },
             )
         }

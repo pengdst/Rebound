@@ -68,6 +68,9 @@ class WorkoutPanelViewModel @Inject constructor(
         it
     }
 
+    private var _finishWorkoutDialogState = MutableStateFlow(false)
+    val finishWorkoutDialogState = _finishWorkoutDialogState.asStateFlow()
+
     private var _workoutName: MutableStateFlow<String?> = MutableStateFlow(null)
     val workoutName = _workoutName.asStateFlow()
 
@@ -302,6 +305,14 @@ class WorkoutPanelViewModel @Inject constructor(
                 junctionId, barbellId
             )
         }
+    }
+
+    fun closeFinishWorkoutDialog() {
+        _finishWorkoutDialogState.value = false
+    }
+
+    fun openFinishWorkoutDialog() {
+        _finishWorkoutDialogState.value = true
     }
 
 }

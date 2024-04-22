@@ -80,6 +80,7 @@
     <string name="add_plate">Add plate</string>
     <string name="workout_in_progress">Workout in progress</string>
     <string name="workout_in_progress_description">You are currently performing a workout. Would you like to discard it?</string>
+    <string name="workout_finish_confirmation">You are currently performing a workout. Are you sure to finish it?</string>
     <string name="cancel">Cancel</string>
     <string name="instructions">Instructions</string>
     <string name="not_enough_data">Not enough data</string>

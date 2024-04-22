@@ -221,9 +221,7 @@ private fun MainLayout(
                                             navigator.navigate(LeafScreen.RestTimer.createRoute())
                                         },
                                         onFinishBtnClicked = {
-                                            workoutPanelViewModel.finishWorkout(onSetsIncomplete = {
-                                                context.toast(message = context.getString(R.string.incomplete_sets_error))
-                                            })
+                                            workoutPanelViewModel.openFinishWorkoutDialog()
                                         })
                                 }) {
                                 Box(
