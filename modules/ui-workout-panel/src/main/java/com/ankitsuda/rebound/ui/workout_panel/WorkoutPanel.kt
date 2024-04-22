@@ -14,43 +14,19 @@
 
 package com.ankitsuda.rebound.ui.workout_panel
 
-import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.*
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.Add
-import androidx.compose.material.icons.outlined.Close
 import androidx.compose.runtime.*
-import androidx.compose.runtime.livedata.observeAsState
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.ankitsuda.base.util.NONE_WORKOUT_ID
-import com.ankitsuda.base.util.toast
-import com.ankitsuda.common.compose.LocalPanel
-import com.ankitsuda.navigation.LeafScreen
 import com.ankitsuda.navigation.LocalNavigator
 import com.ankitsuda.navigation.Navigator
-import com.ankitsuda.rebound.ui.components.AppTextField
+import com.ankitsuda.rebound.ui.components.dialogs.DiscardActiveWorkoutDialog
 import com.ankitsuda.rebound.ui.components.workouteditor.WorkoutEditorComponent
-import com.ankitsuda.rebound.ui.theme.ReboundTheme
-import com.ankitsuda.rebound.ui.components.workouteditor.workoutExerciseItemAlt
 import com.ankitsuda.rebound.ui.workout_panel.components.WorkoutQuickInfo
-import com.google.accompanist.flowlayout.FlowRow
-import com.google.accompanist.flowlayout.MainAxisAlignment
-import com.google.accompanist.flowlayout.SizeMode
-import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.last
-import kotlinx.coroutines.launch
-import timber.log.Timber
 
 @Composable
 fun WorkoutPanel(
@@ -74,6 +50,9 @@ fun WorkoutPanel1(
     val currentSetsStr by viewModel.currentSetsStr.collectAsState("")
     val logEntriesWithJunction by viewModel.logEntriesWithExerciseJunction.collectAsState()
     val barbells by viewModel.barbells.collectAsState(emptyList())
+    var isCancelCurrentWorkoutDialogOpen by remember {
+        mutableStateOf(false)
+    }
 
     val workoutName = workout?.name
     val workoutNote = workout?.note
@@ -111,7 +90,7 @@ fun WorkoutPanel1(
                 viewModel.addExerciseToWorkout(it)
             },
             onCancelCurrentWorkout = {
-                viewModel.cancelCurrentWorkout()
+                isCancelCurrentWorkoutDialogOpen = true
             },
             onDeleteExerciseFromWorkout = {
                 viewModel.deleteExerciseFromWorkout(it)
@@ -138,5 +117,17 @@ fun WorkoutPanel1(
             onRemoveFromSuperset = viewModel::removeFromSuperset,
             onUpdateBarbell = viewModel::updateExerciseBarbellType
         )
+
+        if (isCancelCurrentWorkoutDialogOpen && workout?.startAt != null && workout?.completedAt != null) {
+            DiscardActiveWorkoutDialog(
+                onDismissRequest = {
+                    isCancelCurrentWorkoutDialogOpen = false
+                },
+                onClickDiscard = {
+                    viewModel.cancelCurrentWorkout()
+                    isCancelCurrentWorkoutDialogOpen = false
+                },
+            )
+        }
     }
 }
