@@ -16,7 +16,6 @@ package com.ankitsuda.rebound.ui.settings
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.ankitsuda.base.utils.extensions.lazyAsync
 import com.ankitsuda.base.utils.extensions.shareWhileObserved
 import com.ankitsuda.rebound.data.datastore.PrefStorage
 import com.ankitsuda.rebound.domain.DistanceUnit
@@ -32,6 +31,7 @@ class SettingsScreenViewModel @Inject constructor(
     val weightUnit = prefs.weightUnit.shareWhileObserved(viewModelScope)
     val distanceUnit = prefs.distanceUnit.shareWhileObserved(viewModelScope)
     val firstDayOfWeek = prefs.firstDayOfWeek.shareWhileObserved(viewModelScope)
+    val restTimerSound = prefs.restTimerSound.shareWhileObserved(viewModelScope)
 
     fun setWeightUnit(value: WeightUnit) {
         viewModelScope.launch {
@@ -48,6 +48,12 @@ class SettingsScreenViewModel @Inject constructor(
     fun setFirstDayOfWeek(value: Int) {
         viewModelScope.launch {
             prefs.setFirstDayOfWeek(value)
+        }
+    }
+
+    fun setRestTimerSound(data: String?) {
+        viewModelScope.launch {
+            prefs.setRestTimerSound(data)
         }
     }
 }

@@ -155,6 +155,7 @@
     <string name="metric_m_km">Metric (m/km)</string>
     <string name="imperial_ft_miles">Imperial (ft/miles)</string>
     <string name="first_day_of_the_week">First Day of The Week</string>
+    <string name="rest_timer_sound">Rest Timer Sound</string>
     <string name="sunday">Sunday</string>
     <string name="your_data">Your Data</string>
     <string name="backup_data">Backup Data</string>
