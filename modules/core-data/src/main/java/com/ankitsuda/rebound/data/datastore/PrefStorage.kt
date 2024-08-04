@@ -34,7 +34,11 @@ interface PrefStorage {
     suspend fun setDistanceUnit(value: DistanceUnit)
 
     val firstDayOfWeek: Flow<Int>
+
+    val restTimerSound: Flow<String>
     suspend fun setFirstDayOfWeek(value: Int)
+
+    suspend fun setRestTimerSound(value: String?)
 
     /***
      * clears all the stored data

@@ -15,10 +15,10 @@
 package com.ankitsuda.rebound.data.datastore
 
 import android.content.Context
+import android.media.RingtoneManager
 import androidx.datastore.preferences.core.*
 import com.ankitsuda.base.ui.ThemeState
 import com.ankitsuda.base.util.NONE_WORKOUT_ID
-import com.ankitsuda.domain.models.Optional
 import com.ankitsuda.rebound.domain.DistanceUnit
 import com.ankitsuda.rebound.domain.DistanceUnitSerializer
 import com.ankitsuda.rebound.domain.WeightUnit
@@ -27,14 +27,7 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 import javax.inject.Singleton
-import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.mapLatest
 import kotlinx.serialization.KSerializer
-import kotlinx.serialization.decodeFromString
-import kotlinx.serialization.json.Json
-import kotlinx.serialization.encodeToString
-import timber.log.Timber
 
 @Singleton
 class AppPreferences @Inject constructor(@ApplicationContext private val context: Context) :
@@ -47,6 +40,7 @@ class AppPreferences @Inject constructor(@ApplicationContext private val context
         val WEIGHT_UNIT_KEY = stringPreferencesKey(name = "weight_unit")
         val DISTANCE_UNIT_KEY = stringPreferencesKey(name = "distance_unit")
         val FIRST_DAY_OF_WEEK_KEY = intPreferencesKey(name = "first_day_of_week")
+        val REST_TIMER_SOUND_KEY = stringPreferencesKey(name = "rest_timer_sound_key")
     }
 
     override val themeState: Flow<ThemeState>
@@ -81,8 +75,15 @@ class AppPreferences @Inject constructor(@ApplicationContext private val context
     override val firstDayOfWeek: Flow<Int>
         get() = getValue(FIRST_DAY_OF_WEEK_KEY, 1)
 
+    override val restTimerSound: Flow<String>
+        get() = getValue(REST_TIMER_SOUND_KEY, RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION).toString())
+
     override suspend fun setFirstDayOfWeek(value: Int) {
         setValue(FIRST_DAY_OF_WEEK_KEY, value)
+    }
+
+    override suspend fun setRestTimerSound(value: String?) {
+        setValue(REST_TIMER_SOUND_KEY, value.toString())
     }
 
     override suspend fun clearPreferenceStorage() {
