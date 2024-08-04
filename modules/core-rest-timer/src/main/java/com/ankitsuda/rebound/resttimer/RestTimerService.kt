@@ -17,16 +17,22 @@ package com.ankitsuda.rebound.resttimer
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
-import android.content.Context
 import android.content.Intent
-import android.os.*
+import android.media.RingtoneManager
+import android.net.Uri
+import android.os.Build
+import android.os.CountDownTimer
+import android.os.IBinder
+import android.os.PowerManager
+import android.os.VibrationEffect
+import android.os.Vibrator
 import android.speech.tts.TextToSpeech
 import androidx.annotation.RequiresApi
 import androidx.core.app.NotificationCompat
 import androidx.lifecycle.LifecycleService
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.Observer
 import com.ankitsuda.rebound.coreRestTimer.R
+import com.ankitsuda.rebound.data.datastore.PrefStorage
 import com.ankitsuda.rebound.resttimer.Constants.ACTION_CANCEL
 import com.ankitsuda.rebound.resttimer.Constants.ACTION_CANCEL_AND_RESET
 import com.ankitsuda.rebound.resttimer.Constants.ACTION_INITIALIZE_DATA
@@ -44,13 +50,12 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
 import timber.log.Timber
-import java.util.*
-import java.util.concurrent.TimeUnit
+import java.util.Locale
 import javax.inject.Inject
-import kotlin.collections.ArrayList
+
 
 /**
  * Thanks to
@@ -58,6 +63,8 @@ import kotlin.collections.ArrayList
  */
 @AndroidEntryPoint
 class RestTimerService : LifecycleService(), TextToSpeech.OnInitListener {
+    @Inject
+    lateinit var prefStorage: PrefStorage
 
     // notification builder
     @Inject
@@ -222,6 +229,7 @@ class RestTimerService : LifecycleService(), TextToSpeech.OnInitListener {
 
     override fun onDestroy() {
         super.onDestroy()
+        vibrator.cancel()
         Timber.i("onDestroy")
         // cancel coroutine job and TTS
         serviceJob.cancel()
@@ -287,6 +295,24 @@ class RestTimerService : LifecycleService(), TextToSpeech.OnInitListener {
     }
 
     private fun onTimerFinish() {
+        val duration = 1500L
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val vibraEffect =
+                VibrationEffect.createOneShot(duration, VibrationEffect.DEFAULT_AMPLITUDE)
+            vibrator.cancel()
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                vibrator.vibrate(vibraEffect)
+            } else {
+                vibrator.vibrate(duration)
+            }
+        }
+
+        serviceScope.launch(Dispatchers.Main) {
+            val restTimer = prefStorage.restTimerSound.firstOrNull()
+            val alarmSound = Uri.parse(restTimer)
+            val ringtone = RingtoneManager.getRingtone(this@RestTimerService , alarmSound)
+            ringtone.play()
+        }
         // increase timerIndex
         timerIndex += 1
         Timber.i("onTimerFinish - timerIndex: $timerIndex - maxRep: $timerMaxRepetitions")
