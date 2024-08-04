@@ -20,12 +20,13 @@ import android.content.Context
 import android.content.Intent
 import android.os.Build
 import android.os.Vibrator
+import android.os.VibratorManager
 import androidx.core.app.NotificationCompat
+import androidx.core.content.ContextCompat
 import com.ankitsuda.rebound.coreRestTimer.R
 import com.ankitsuda.rebound.resttimer.Constants.ACTION_CANCEL
 import com.ankitsuda.rebound.resttimer.Constants.ACTION_PAUSE
 import com.ankitsuda.rebound.resttimer.Constants.ACTION_RESUME
-import com.ankitsuda.rebound.resttimer.Constants.ACTION_SHOW_MAIN_ACTIVITY
 import com.ankitsuda.rebound.resttimer.Constants.NOTIFICATION_CHANNEL_ID
 import dagger.Module
 import dagger.Provides
@@ -119,7 +120,10 @@ object RestTimerModule {
     @Provides
     fun provideVibrator(
         @ApplicationContext app: Context
-    ): Vibrator = app.getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
+    ): Vibrator = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+        val vibratorManager = ContextCompat.getSystemService(app, VibratorManager::class.java)
+        vibratorManager?.defaultVibrator!!
+    } else ContextCompat.getSystemService(app, Vibrator::class.java)!!
 
     @ServiceScoped
     @Provides
